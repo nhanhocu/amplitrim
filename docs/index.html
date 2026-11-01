@@ -147,10 +147,10 @@ amplitrim --input-dir reads/ --work-dir work --out-dir report</code></pre></div>
 Analysing reads...
 
 Recommended DADA2 settings
-  truncLenF = 231   truncLenR = 217   maxEE = 2   minOverlap = 12
+  truncLenF = 230   truncLenR = 216   maxEE = 2   minOverlap = 12
 
-  99.7% of the 12,000 read pairs analysed should pass filtering and merge.
-  Covers amplicons up to 436 nt (your longest: 434 nt).
+  89.3% of the 3,000 read pairs analysed should pass filtering and merge.
+  Covers amplicons up to 434 nt (your longest: 434 nt).
 
 Report: report/REPORT.md</code></pre></div>
 <p><code>report/REPORT.md</code> has the settings with copy-paste snippets for DADA2 in R and in QIIME 2's <code>dada2 denoise-paired</code>, what to expect, and anything worth checking. To try it without your own data, make a small simulated dataset (from a clone of this repository; the generator needs numpy):</p>

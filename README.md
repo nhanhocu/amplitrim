@@ -70,10 +70,10 @@ AmpliTrim 0.1.0
 Analysing reads...
 
 Recommended DADA2 settings
-  truncLenF = 231   truncLenR = 217   maxEE = 2   minOverlap = 12
+  truncLenF = 230   truncLenR = 216   maxEE = 2   minOverlap = 12
 
-  99.7% of the 12,000 read pairs analysed should pass filtering and merge.
-  Covers amplicons up to 436 nt (your longest: 434 nt).
+  89.3% of the 3,000 read pairs analysed should pass filtering and merge.
+  Covers amplicons up to 434 nt (your longest: 434 nt).
 
 Report: report/REPORT.md
 ```
