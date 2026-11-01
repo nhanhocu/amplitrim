@@ -52,8 +52,6 @@ DADA2's author calls maxEE = 2 a good general purpose value and says that relaxi
 - Amplicons: 423-434 nt (median 427), measured from the 98% of pairs that merge at full read length.
 - Overlap at the recommended settings: about 20 nt on average.
 
-![summary](summary.png)
-
 ## How these settings were chosen
 
 - 3,000 of 3,000 read pairs were analysed. Totals below 446 nt (your longest amplicon plus the minimum overlap of 12) were not tested.
