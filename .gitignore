@@ -23,3 +23,7 @@ report/
 # (the text outputs of the runs reach the archive only through validation/collect_results.py, into results/)
 amplitrim_paths.json
 nocap_check_out/
+
+# demo and example outputs
+out/
+demo/
