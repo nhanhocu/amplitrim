@@ -3,6 +3,8 @@ message: "If you use AmpliTrim, please cite it as below."
 title: "AmpliTrim: choosing DADA2 truncation lengths and maxEE from the reads themselves"
 type: software
 version: "0.1.0"
+doi: "10.5281/zenodo.23860407"
+date-released: "2026-11-01"
 license: MIT
 repository-code: "https://github.com/paytonyau/amplitrim"
 abstract: >-
@@ -18,4 +20,3 @@ keywords:
   - 16S rRNA
   - ITS
   - paired-end reads
-# add when releasing: date-released, and doi (from the archived release)
