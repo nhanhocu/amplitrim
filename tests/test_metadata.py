@@ -31,8 +31,8 @@ def built():
         import setuptools
     except ImportError:
         pytest.skip("setuptools is not installed")
-    if int(setuptools.__version__.split(".")[0]) < 68:
-        pytest.skip("setuptools older than 68 cannot read the project table")
+    if int(setuptools.__version__.split(".")[0]) < 77:
+        pytest.skip("setuptools older than 77 cannot read an SPDX license expression")
     work = Path(tempfile.mkdtemp(prefix="amplitrim_build_"))
     atexit.register(shutil.rmtree, str(work), True)
     src, out = work / "src", work / "out"
@@ -88,13 +88,13 @@ def test_the_built_metadata_is_complete_and_claims_only_what_ci_tests():
     author = "%s %s" % (re.search(r'given-names:\s*"([^"]+)"', cff).group(1), re.search(r'family-names:\s*"([^"]+)"', cff).group(1))
     assert fields(meta, "Name") == ["amplitrim"] and fields(meta, "Version") == [v] and fields(meta, "Requires-Python") == [">=3.9"]
     assert fields(meta, "Author") == [author]                                                          # the name in the citation file
-    assert fields(meta, "Description-Content-Type") == ["text/markdown"] and fields(meta, "License-File") == ["LICENSE"]
+    assert fields(meta, "Description-Content-Type") == ["text/markdown"] and fields(meta, "License-File") == ["LICENSE"] and fields(meta, "License-Expression") == ["MIT"]
     runtime = {r.replace(" ", "") for r in fields(meta, "Requires-Dist") if "extra ==" not in r}
     assert runtime == {"numpy>=1.24"}, runtime                                                          # one runtime dependency: the figure's matplotlib, the tests' pandas and pytest are extras
     extras = {extra_requirement(r) for r in fields(meta, "Requires-Dist") if "extra ==" in r}
     assert "matplotlib>=3.7;extra=='plot'" in extras, extras                                           # the figure's matplotlib is the optional "plot" extra
     classifiers = set(fields(meta, "Classifier"))
-    for c in ("Environment :: Console", "Operating System :: OS Independent", "Topic :: Scientific/Engineering :: Bio-Informatics", "License :: OSI Approved :: MIT License"):
+    for c in ("Environment :: Console", "Operating System :: OS Independent", "Topic :: Scientific/Engineering :: Bio-Informatics"):
         assert c in classifiers, c
     ci = read(".github/workflows/tests.yml"); matrix = ci[ci.index("matrix:"):ci.index("runs-on:")]
     tested = set(re.findall(r'"(3\.\d+)"', matrix))

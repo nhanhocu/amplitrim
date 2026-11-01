@@ -11,10 +11,10 @@ Requirements: Python 3.9 or later and [vsearch](https://github.com/torognes/vsea
 ```bash
 conda create -n amplitrim python=3.12 -y && conda activate amplitrim     # or any Python 3.9+ environment
 conda install -c bioconda vsearch                                         # or: apt install vsearch / brew install vsearch
-pip install .
+pip install amplitrim
 ```
 
-The figure `summary.png` needs matplotlib, which is optional: `pip install ".[plot]"`. Without it AmpliTrim writes `REPORT.md` and `summary.json` as usual and says that no figure was drawn.
+The figure `summary.png` needs matplotlib, which is optional: `pip install "amplitrim[plot]"`. Without it AmpliTrim writes `REPORT.md` and `summary.json` as usual and says that no figure was drawn.
 
 **Windows** (Anaconda or Miniconda Prompt). The Python packages all have Windows builds on PyPI, so use `pip` inside a conda
 environment. vsearch comes from its own Windows download.
@@ -22,11 +22,10 @@ environment. vsearch comes from its own Windows download.
 ```bat
 conda create -n amplitrim python=3.12 -y
 conda activate amplitrim
-cd C:\path\to\amplitrim
-pip install -e .
+pip install amplitrim
 ```
 
-(or `conda env create -f environment.yml`, which does the same). Then install vsearch:
+To work on the code instead, clone the repository and run `pip install -e ".[test]"` in its folder (`conda env create -f environment.yml` makes a development environment that does the same). Then install vsearch:
 
 1. Download `vsearch-2.32.0-win-x86_64.zip` (or the newest `win-x86_64` zip) from
    <https://github.com/torognes/vsearch/releases> and unzip it, for example to `C:\tools`. Keep its `bin` folder intact:

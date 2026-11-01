@@ -140,7 +140,7 @@ footer p{margin:.2rem 0}
 
 <section class="wrap" id="quick-start">
 <h2>Quick start</h2>
-<div class="codeblock copyable"><pre><code>pip install .      # Python 3.9 or later; vsearch must also be on your PATH
+<div class="codeblock copyable"><pre><code>pip install amplitrim      # Python 3.9 or later; vsearch must also be on your PATH
 amplitrim --input-dir reads/ --work-dir work --out-dir report</code></pre></div>
 <p>Example output (from simulated reads; your numbers will differ):</p>
 <div class="codeblock"><pre><code>AmpliTrim 0.1.0
@@ -170,7 +170,7 @@ amplitrim --input-dir demo/primer_trimmed --work-dir work --out-dir out</code></
 <section class="wrap" id="how">
 <h2>How the settings are chosen</h2>
 <div class="scroll"><table><thead><tr><th scope="col">Setting</th><th scope="col">How</th></tr></thead><tbody><tr><th scope="row"><code>truncLenF</code>, <code>truncLenR</code></th><td>The shortest total that can merge your longest amplicons (the amplicon plus 12), split between the two reads where quality allows. Real merges are tested with vsearch</td></tr><tr><th scope="row"><code>maxEE</code></th><td>2 (DADA2's default) for clean reads. For noisy reads, a limit for each read that covers three quarters of its reads, never below 2, with a note if it goes above 5 (<a href="https://github.com/paytonyau/amplitrim/blob/main/docs/usage.md#how-maxee-is-chosen">how</a>)</td></tr><tr><th scope="row"><code>minOverlap</code></th><td>12 (DADA2's default)</td></tr></tbody></table></div>
-<p>The outputs are <code>REPORT.md</code> (read this one), <code>summary.json</code> (for scripts; <a href="https://github.com/paytonyau/amplitrim/blob/main/docs/usage.md#summaryjson-for-scripts-and-workflow-managers">every key</a>) and, if matplotlib is installed (<code>pip install ".[plot]"</code>), <code>summary.png</code> (a figure of your amplicon lengths and how errors build up).</p>
+<p>The outputs are <code>REPORT.md</code> (read this one), <code>summary.json</code> (for scripts; <a href="https://github.com/paytonyau/amplitrim/blob/main/docs/usage.md#summaryjson-for-scripts-and-workflow-managers">every key</a>) and, if matplotlib is installed (<code>pip install "amplitrim[plot]"</code>), <code>summary.png</code> (a figure of your amplicon lengths and how errors build up).</p>
 </section>
 
 <section class="wrap" id="limits">

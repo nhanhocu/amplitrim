@@ -59,7 +59,7 @@ What held, what did not, and the limits are on the [validation page](https://git
 ## Quick start
 
 ```bash
-pip install .      # Python 3.9 or later; vsearch must also be on your PATH
+pip install amplitrim      # Python 3.9 or later; vsearch must also be on your PATH
 amplitrim --input-dir reads/ --work-dir work --out-dir report
 ```
 
@@ -105,7 +105,7 @@ Required: `--input-dir`, `--work-dir` and `--out-dir`. Optional: `--its` (for am
 | `maxEE` | 2 (DADA2's default) for clean reads. For noisy reads, a limit for each read that covers three quarters of its reads, never below 2, with a note if it goes above 5 ([how](https://github.com/paytonyau/amplitrim/blob/main/docs/usage.md#how-maxee-is-chosen)) |
 | `minOverlap` | 12 (DADA2's default) |
 
-The outputs are `REPORT.md` (read this one), `summary.json` (for scripts; [every key](https://github.com/paytonyau/amplitrim/blob/main/docs/usage.md#summaryjson-for-scripts-and-workflow-managers)) and, if matplotlib is installed (`pip install ".[plot]"`), `summary.png` (a figure of your amplicon lengths and how errors build up).
+The outputs are `REPORT.md` (read this one), `summary.json` (for scripts; [every key](https://github.com/paytonyau/amplitrim/blob/main/docs/usage.md#summaryjson-for-scripts-and-workflow-managers)) and, if matplotlib is installed (`pip install "amplitrim[plot]"`), `summary.png` (a figure of your amplicon lengths and how errors build up).
 
 ## Limits
 
