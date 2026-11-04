@@ -136,16 +136,11 @@ def _warnings(res: Result, given_longest: bool) -> List[str]:
     cfg = res.cfg
     qv = getattr(sub, "quality_values", 0)
     if 0 < qv <= 2:
-        w.append(f"Quality scores take only {qv} distinct value{'s' if qv > 1 else ''}, so the per-base quality that "
-                 f"DADA2 relies on is missing. In a test, DADA2 could not learn an error model from such data. This "
-                 f"is consistent with a simplified-quality file such as the SRA 'lite' format; use the original "
-                 f"FASTQ files instead.")
+        w.append(f"Quality scores take only {qv} distinct value{'s' if qv > 1 else ''} (a simplified file such as SRA 'lite'), "
+                 f"and DADA2 failed on such data in our test. Use the original FASTQ files.")
     if not given_longest and res.frac_overlapping < 0.9:
-        w.append(f"Only {res.frac_overlapping:.0%} of read pairs could be merged at full read length. "
-                 f"Some amplicons may be longer than your reads can span (about "
-                 f"{res.max_combined - cfg.dada2_min_overlap} nt), some reads may be shorter than the rest, "
-                 f"or the overlaps may be of poor quality or repetitive. The amplicon lengths above come "
-                 f"from the pairs that did merge.")
+        w.append(f"Only {res.frac_overlapping:.0%} of read pairs could be merged at full read length (amplicons longer than about "
+                 f"{res.max_combined - cfg.dada2_min_overlap} nt, or some reads shorter than the rest); the lengths above come from the pairs that merged.")
     if res.floor <= res.max_combined and res.max_combined - res.floor < 6:
         w.append(f"The reads only just span your longest amplicons (spare length: "
                  f"{res.max_combined - res.floor} nt). Longer reads would be more reliable.")
@@ -162,8 +157,8 @@ def _warnings(res: Result, given_longest: bool) -> List[str]:
     else:
         if not sub.uniform_length and res.short_lost >= 0.01:
             w.append(f"Read lengths vary (forward {sub.min_len_f}-{sub.read_len_f} nt, reverse "
-                     f"{sub.min_len_r}-{sub.read_len_r} nt). DADA2 discards reads shorter than truncLen, "
-                     f"which loses {res.short_lost:.0%} of read pairs at these settings.")
+                     f"{sub.min_len_r}-{sub.read_len_r} nt): DADA2 drops reads shorter than truncLen, "
+                     f"which loses {res.short_lost:.0%} of pairs here.")
         if rec.yield_est < 0.7:
             w.append(f"Only {rec.yield_est:.0%} of read pairs are expected to pass filtering and merge.")
         elif rec.ee_pass_rate < 0.8:
@@ -397,8 +392,8 @@ def run(s: Settings, say: Callable[[str], None] = lambda msg: None) -> Result:
         return first
     second.relaxed, second.pass_rate_default, second.rule = True, first.pass_rate_default, rule
     if rule["above_warning"]:
-        second.warnings.append(f"The rule sets maxEE {rule['max_ee'][0]},{rule['max_ee'][1]}, above {WARN_ABOVE}: these reads are very noisy, and more low-quality reads may not improve the relative abundances "
-                               f"(DADA2's author). Check on a mock community if you can.")
+        second.warnings.append(f"The rule sets maxEE {rule['max_ee'][0]},{rule['max_ee'][1]}, above {WARN_ABOVE}: these reads are very noisy; more low-quality reads may not help. "
+                               f"Check on a mock community if you can.")
     return second
 
 

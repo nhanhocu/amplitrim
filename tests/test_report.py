@@ -96,7 +96,7 @@ def test_low_merge_rate_warning_names_shorter_reads_among_the_possible_causes():
     res.frac_overlapping = 0.75
     text = " ".join(_warnings(res, False))
     assert "Only 75% of read pairs could be merged at full read length" in text
-    assert "some reads may be shorter than the rest" in text
+    assert "shorter than the rest" in text
 
 
 def test_report_has_a_plain_your_data_section_and_no_read_through_note_when_amplicons_are_longer(tmp_path):

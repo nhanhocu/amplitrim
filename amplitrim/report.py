@@ -46,6 +46,8 @@ def _maxee_note(res: Result, short: bool = False) -> str:
     ee = _ee_text(res.cfg.max_ee)
     if rule is None:                                                          # ITS, a maxEE given in the settings, or no cut to measure at
         if res.marker == "its":
+            if short:
+                return "maxEE is 2, DADA2's default. AmpliTrim does not adjust it for ITS, where the reads are not cut at a common position."
             return "maxEE is 2, DADA2's default. AmpliTrim does not adjust it for ITS: reads are not cut at a common position, so there is no cut to measure them at (each read is only trimmed where its quality first falls to 2 or below), and the rule has not been tested on reads of different lengths."
         if ee_pair(res.cfg.max_ee) == (2.0, 2.0):
             return f"maxEE is 2, DADA2's default: {r.ee_pass_rate:.0%} of the read pairs pass it at these settings."
@@ -55,7 +57,7 @@ def _maxee_note(res: Result, short: bool = False) -> str:
     if res.relaxed:
         had = "none of the read pairs pass" if not res.pass_rate_default else f"only {res.pass_rate_default:.0%} of the read pairs pass"
         if short:
-            return (f"maxEE is {ee}, not 2: {had} at maxEE 2; each limit covers three quarters of the reads in its direction (never below 2).")
+            return (f"maxEE is {ee}, not 2: {had} at maxEE 2. Each limit lets the best three quarters of the reads in its direction pass.")
         return (f"maxEE is {ee}, not DADA2's default of 2: at the recommended cut the {RULE_Q * 100:.0f}th percentile of the reads' expected errors is {pf:.1f} forward and {pr:.1f} "
                 f"reverse, so each read's limit is set to cover three quarters of the reads in its direction (never below 2). {had[0].upper() + had[1:]} at maxEE 2 and "
                 f"{r.ee_pass_rate:.0%} pass now; the reads this admits are noisier (see the table below). DADA2's author says that relaxing maxEE somewhat is acceptable, "
