@@ -5,6 +5,8 @@ type: software
 version: "0.2.0"
 license: MIT
 repository-code: "https://github.com/paytonyau/amplitrim"
+doi: "10.5281/zenodo.23962713"
+date-released: "2026-11-04"
 abstract: >-
   AmpliTrim recommends DADA2 truncLenF, truncLenR and maxEE for paired-end amplicon reads and tests candidate settings on the user's own reads: it replicates DADA2's
   quality filter from the quality scores, sets a coverage floor from the amplicon lengths, estimates the merge yield with vsearch, and chooses maxEE per read from the reads' expected errors.
