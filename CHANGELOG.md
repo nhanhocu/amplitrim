@@ -7,6 +7,7 @@
 - Three optional arguments (`--its`, `--min-overlap`, `--verbose`).
 - A comment in `config.py` no longer claims command-line options that did not exist.
 - The run time and memory of a run were measured (34 to 54 seconds and at most 292 MB on three real datasets), and the default minimum overlap of 12 nt was tested against 10, 15, 20 and 25 nt on four mock communities (validation archive, register sections 27 and 28).
+- Warnings are shortened to one line each.
 
 ## 0.1.0
 
