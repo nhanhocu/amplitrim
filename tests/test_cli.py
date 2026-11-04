@@ -10,7 +10,7 @@ from conftest import need_vsearch
 REQUIRED = ["--input-dir", "in", "--work-dir", "work", "--out-dir", "out"]
 
 
-@pytest.mark.parametrize("option", ["--region", "--primer-f-len", "--splits", "--a-values", "--max-ee", "--marker", "--min-overlap",
+@pytest.mark.parametrize("option", ["--region", "--primer-f-len", "--splits", "--a-values", "--max-ee", "--marker",
                                     "--figaro-script", "--explore-max-ee", "--explore-coverage", "--exhaustive", "--longest-insert"])
 def test_removed_options_are_rejected(option):
     """AmpliTrim recommends; it does not take the settings it is meant to recommend, and it has no tuning options."""
@@ -18,11 +18,11 @@ def test_removed_options_are_rejected(option):
         cli.main(REQUIRED + [option, "x"])
 
 
-def test_options_are_three_required_arguments_then_two_optional_ones():
+def test_options_are_three_required_arguments_then_three_optional_ones():
     ap = cli.build_parser()
     groups = {g.title: [a.option_strings[0] for a in g._group_actions] for g in ap._action_groups}
     assert groups["required arguments"] == ["--input-dir", "--work-dir", "--out-dir"]
-    assert groups["optional arguments"] == ["--its", "--verbose"]
+    assert groups["optional arguments"] == ["--its", "--min-overlap", "--verbose"]
     assert [a.option_strings[0] for a in ap._actions if a.required] == ["--input-dir", "--work-dir", "--out-dir"]
 
 

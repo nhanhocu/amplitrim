@@ -1,7 +1,7 @@
 """
 Defaults for the settings that should mirror the DADA2 call you will actually run (for example
 `qiime dada2 denoise-paired --p-max-ee-f 2`), because merging is tested under those rules.
-`min_overlap` and `max_ee` can be set on the command line.
+`--min-overlap` (12 to 20) is set on the command line.
 """
 
 import argparse

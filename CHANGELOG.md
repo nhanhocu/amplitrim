@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+- `--min-overlap` sets the minimum overlap between the forward and the reverse read, from 12 to 20 nt (default 12, DADA2's default for `mergePairs`). It sets the shortest total length (the longest amplicon plus the overlap), is used in the merge tests, and appears as `minOverlap` in the report and in `summary.json`. Use the same value in your DADA2 `mergePairs` call. The validation was run at 12.
+- `amplitrim.api.recommend()` is a programmatic entry point that returns the result, the path of the report and the parsed `summary.json`, and raises `PipelineError` or `RuntimeError` for bad input or a missing vsearch. The command line now calls it, so a script, a workflow wrapper and the command line give the same answer.
+- Three optional arguments (`--its`, `--min-overlap`, `--verbose`).
+- A comment in `config.py` no longer claims command-line options that did not exist.
+
 ## 0.1.0
 
 First release.

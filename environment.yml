@@ -8,9 +8,8 @@ dependencies:
   - python=3.12
   - pip
   - numpy
-  - pandas
-  - matplotlib
   - pandas        # used by the tests
+  - matplotlib
   - pytest
   - pip:
       - -e .

@@ -69,11 +69,13 @@ Run AmpliTrim after adapter and primer removal and before `filterAndTrim`.
 
 ## Arguments
 
-Three are required (`--input-dir`, `--work-dir`, `--out-dir`) and two are optional (`--its`, `--verbose`); see the [README](../README.md#options).
+Three are required (`--input-dir`, `--work-dir`, `--out-dir`) and three are optional (`--its`, `--min-overlap`, `--verbose`); see the [README](../README.md#options).
 
 `--work-dir` holds intermediate files (the subsample, trimmed and merged reads) and can be deleted afterwards. It is required, and it has no default inside the output folder, for a reason that applies to Windows. The Windows build of vsearch opens files by their names in the system's ANSI code page. Accented letters from your code page work, and any other character is refused with a clear message. Use a plain folder such as `C:\amplitrim_work`.
 
 **`--its`.** By default AmpliTrim treats the amplicons as roughly the same length (16S, 18S and most other regions): it measures their lengths and searches for truncation lengths. Where amplicon lengths vary a lot (ITS), a fixed `truncLen` would discard every read shorter than it, so DADA2's own ITS workflow does not use one. `--its` evaluates exactly that workflow, with its settings (`maxN = 0`, `truncQ = 2`, `minLen = 50` and `maxEE = c(2,2)`). Each read is cut at its first base of quality 2 or below (`truncQ = 2`, DADA2's permissive default, so only the very worst tails are cut). A pair is then kept if both reads are at least 50 nt long (`minLen`), contain no N and are within `maxEE`. A read with a noisy tail is not shortened: it is dropped when its expected errors exceed `maxEE`. AmpliTrim reports the expected share of pairs that pass and merge, and recommends no fixed truncation length. The ITS report also shows **where the pairs go** (too short after the cut, containing an N, over `maxEE`, passing but not merging). It also says what share of the reads would pass the same filter if you used the forward reads alone. DADA2's author calls this "totally reasonable" when the reverse reads are poor (issue #236, 2017). On the one ITS dataset we tested, the filter rows and the forward-only share match DADA2's own filter exactly, and the merging rows are an optimistic upper bound. The figures, and where DADA2 loses the rest of the pairs, are on the [validation page](https://github.com/paytonyau/amplitrim-validation/blob/main/docs/validation.md#its---its).
+
+**`--min-overlap`.** The minimum overlap, in nt, between the forward and the reverse read: a whole number from 12 to 20. The default is 12, DADA2's default for `mergePairs`. It sets the shortest total length the cut-points must reach (the longest amplicon plus this overlap), it is used in the merge tests, and it is reported as `minOverlap`. A larger value needs more bases from the noisier read ends. On the simulated demo, 20 instead of 12 raised the recommended total length by 8 nt (230/216 became 231/223) and lowered the expected share of pairs that pass and merge from 89.3% to 88.2%. Use the same value as the `minOverlap` of your DADA2 `mergePairs` call, because merging is tested under the same rule. The validation archive used 12.
 
 ## What AmpliTrim recommends
 
@@ -81,7 +83,7 @@ Three are required (`--input-dir`, `--work-dir`, `--out-dir`) and two are option
 |---|---|
 | `truncLenF`, `truncLenR` | Searched on your reads (see [How it works](#how-it-works)) |
 | `maxEE` | Per read, the limit that covers three quarters of the reads at the recommended cut, never below 2, with no upper limit ([how maxEE is chosen](#how-maxee-is-chosen)) |
-| `minOverlap`, `maxMismatch` | `12` and `0`, DADA2's defaults for `mergePairs` |
+| `minOverlap`, `maxMismatch` | `12` (or the value of `--min-overlap`, 12 to 20) and `0`; 12 and 0 are DADA2's defaults for `mergePairs` |
 
 These are DADA2 settings, for DADA2 in R or in QIIME 2's DADA2 plugin. QIIME 2 also offers Deblur, which is a different method: it takes single or already merged reads, trims them all to one length (`--p-trim-length`), and has no `truncLenF`, `truncLenR` or `maxEE`, because its quality filtering is a separate step. AmpliTrim's recommendations therefore do not apply to Deblur, and we have not tested AmpliTrim with it. The amplicon lengths in the report may help you choose a trim length, but AmpliTrim does not recommend one. See the QIIME 2 documentation for Deblur.
 
@@ -110,7 +112,7 @@ Exit status: `0` recommendation made, `2` nothing tested could merge your longes
 | `recommended.truncLenF`, `.truncLenR` | DADA2 `truncLen` (0 and 0 with `--its`: no fixed truncation length) |
 | `recommended.maxEE_f`, `.maxEE_r` | The `maxEE` of the recommendation, always one number each |
 | `recommended.maxEE` | The same as one number when both reads share it, a pair otherwise (kept for older scripts; prefer `maxEE_f` and `maxEE_r`) |
-| `recommended.minOverlap`, `.maxMismatch` | The `mergePairs` settings assumed (12 and 0) |
+| `recommended.minOverlap`, `.maxMismatch` | The `mergePairs` settings assumed (12, or the value of `--min-overlap`, and 0) |
 | `recommended.estimated_yield` | Expected share of pairs that pass and merge (an optimistic estimate; see Limitations) |
 | `recommended.longest_mergeable_insert` | The longest amplicon these settings can merge, in nt |
 | `recommended.minLen` | Only with `--its` |
@@ -149,6 +151,19 @@ workflow {
     // settings.truncLenF, settings.truncLenR, settings.maxEE_f, settings.maxEE_r go to the DADA2 step
 }
 ```
+
+## Using AmpliTrim from Python
+
+`amplitrim.api.recommend()` does what the command line does and returns the answer, for a script or a workflow wrapper:
+
+```python
+from amplitrim.api import recommend
+
+result, report, summary = recommend("reads/", "work/", "report/", its=False, min_overlap=12)
+print(summary["recommended"])            # None when nothing could merge the longest amplicons
+```
+
+It writes `REPORT.md`, `summary.json` and, with matplotlib installed, `summary.png` to the output folder, and returns the result object, the path of the report and the parsed `summary.json`. It raises `PipelineError` or `RuntimeError` for bad input or a missing vsearch, where the command line prints the message and exits with status 3.
 
 ## How it works
 

@@ -66,7 +66,7 @@ amplitrim --input-dir reads/ --work-dir work --out-dir report
 Example output (from simulated reads; your numbers will differ):
 
 ```
-AmpliTrim 0.1.0
+AmpliTrim 0.2.0
 Analysing reads...
 
 Recommended DADA2 settings
@@ -95,15 +95,15 @@ These reads are simulated, so use them to see what the report looks like, not to
 
 ## Options
 
-Required: `--input-dir`, `--work-dir` and `--out-dir`. Optional: `--its` (for amplicons that vary a lot in length, such as ITS) and `--verbose`. AmpliTrim chooses everything else, including `maxEE` ([user guide](https://github.com/paytonyau/amplitrim/blob/main/docs/usage.md#arguments)).
+Required: `--input-dir`, `--work-dir` and `--out-dir`. Optional: `--its` (for amplicons that vary a lot in length, such as ITS), `--min-overlap` (the minimum overlap between the reads, 12 to 20; default 12) and `--verbose`. AmpliTrim chooses everything else, including `maxEE` ([user guide](https://github.com/paytonyau/amplitrim/blob/main/docs/usage.md#arguments)).
 
 ## How the settings are chosen
 
 | Setting | How |
 |---|---|
-| `truncLenF`, `truncLenR` | The shortest total that can merge your longest amplicons (the amplicon plus 12), split between the two reads where quality allows. Real merges are tested with vsearch |
+| `truncLenF`, `truncLenR` | The shortest total that can merge your longest amplicons (the amplicon plus the minimum overlap, 12 by default), split between the two reads where quality allows. Real merges are tested with vsearch |
 | `maxEE` | 2 (DADA2's default) for clean reads. For noisy reads, a limit for each read that covers three quarters of its reads, never below 2, with a note if it goes above 5 ([how](https://github.com/paytonyau/amplitrim/blob/main/docs/usage.md#how-maxee-is-chosen)) |
-| `minOverlap` | 12 (DADA2's default) |
+| `minOverlap` | 12 (DADA2's default), or the value you give with `--min-overlap` (12 to 20); use the same value in `mergePairs` |
 
 The outputs are `REPORT.md` (read this one), `summary.json` (for scripts; [every key](https://github.com/paytonyau/amplitrim/blob/main/docs/usage.md#summaryjson-for-scripts-and-workflow-managers)) and, if matplotlib is installed (`pip install "amplitrim[plot]"`), `summary.png` (a figure of your amplicon lengths and how errors build up).
 

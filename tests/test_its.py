@@ -1,7 +1,6 @@
 """ITS mode: where the pairs go, and what the forward reads alone would keep. vsearch is replaced by a stand-in (see fake_vsearch.py), so these run without it."""
 import json
 
-import numpy as np
 import pytest
 
 from amplitrim import pipeline
