@@ -3,6 +3,8 @@ message: "If you use AmpliTrim, please cite it as below."
 title: "AmpliTrim: choosing DADA2 truncation lengths and maxEE from the reads themselves"
 type: software
 version: "0.2.0"
+doi: "10.5281/zenodo.23962713"
+date-released: "2026-11-04"
 license: MIT
 repository-code: "https://github.com/paytonyau/amplitrim"
 doi: "10.5281/zenodo.23962713"
