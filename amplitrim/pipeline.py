@@ -16,12 +16,12 @@ import os
 import shutil
 from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Callable, List, Optional
+from typing import Callable, Dict, List, Optional
 
 import numpy as np
 
 from .config import Config, ee_pair
-from .merge_wrapper import estimate_insert_sizes, run_vsearch
+from .merge_wrapper import estimate_insert_sizes, parse_vsearch_log, run_vsearch
 from .ranking import Candidate, coverage_floor, frac_unmergeable, select_recommendation
 from .subsample import DEFAULT_MAX_PAIRS, SubsampleInfo, build_subsample
 from .trimmer import ReadPairs
@@ -68,6 +68,7 @@ class Result:
     warnings: List[str] = field(default_factory=list)
     step: int = 2
     exhaustive: bool = False
+    full_length_fail_reasons: Dict[str, int] = field(default_factory=dict)   # vsearch's reasons, stage 0
     tolerance: float = 0.01
     short_lost: float = 0.0              # share of pairs shorter than the recommended truncation
     marker: str = "16s"
@@ -131,6 +132,41 @@ def _evaluate(pairs: ReadPairs, trim_f: int, trim_r: int, cfg: Config, floor: in
         balance=abs(trim_f / longest_reads[0] - trim_r / longest_reads[1]) if all(longest_reads) else 0.0)
 
 
+# vsearch's reasons for an unmerged pair, grouped by what they say about the data
+_QUALITY_REASONS = ("too many differences", "alignment score too low", "expected error too high", "too many n")
+_OVERLAP_REASONS = ("too few kmers", "overlap too short", "no alignment", "multiple potential alignments", "staggered")
+
+
+def _stage0_reasons(work: Path) -> Dict[str, int]:
+    """vsearch's reasons for the pairs it could not merge at full length (empty if the log is missing)."""
+    log = work / "stage0" / "stage0.tolerant.vsearch.log"
+    if not log.exists():
+        return {}
+    return parse_vsearch_log(log.read_bytes().decode("utf-8", errors="replace"), "tolerant").fail_reasons
+
+
+def _full_length_warning(res: Result, cfg: Config) -> str:
+    """The stage-0 warning, worded by why vsearch could not merge the pairs.
+    Low-quality read ends (too many differences in the overlap, or a low alignment score) are not evidence of long
+    amplicons, so the 'longer than' wording is kept only when most failures are a missing overlap."""
+    head = f"Only {res.frac_overlapping:.0%} of read pairs could be merged at full read length"
+    tail = "; the lengths above come from the pairs that merged."
+    fails = res.full_length_fail_reasons or {}
+    total = sum(fails.values())
+    if total:
+        low = {k.lower(): v for k, v in fails.items()}
+        quality = sum(v for k, v in low.items() if any(r in k for r in _QUALITY_REASONS))
+        overlap = sum(v for k, v in low.items() if any(r in k for r in _OVERLAP_REASONS))
+        if quality / total >= 0.5:
+            return (f"{head}, mostly because the read ends are of low quality ({quality / total:.0%} of the unmerged pairs "
+                    f"had too many differences in the overlap or a low alignment score). This does not mean the amplicons "
+                    f"are long{tail}")
+        if overlap / total < 0.5:
+            return f"{head} (vsearch gave several reasons, none for most pairs){tail}"
+    return (f"{head} (amplicons longer than about {res.max_combined - cfg.dada2_min_overlap} nt, "
+            f"or some reads shorter than the rest){tail}")
+
+
 def _warnings(res: Result, given_longest: bool) -> List[str]:
     w, rec, sub = [], res.recommendation, res.sub
     cfg = res.cfg
@@ -139,8 +175,7 @@ def _warnings(res: Result, given_longest: bool) -> List[str]:
         w.append(f"Quality scores take only {qv} distinct value{'s' if qv > 1 else ''} (a simplified file such as SRA 'lite'), "
                  f"and DADA2 failed on such data in our test. Use the original FASTQ files.")
     if not given_longest and res.frac_overlapping < 0.9:
-        w.append(f"Only {res.frac_overlapping:.0%} of read pairs could be merged at full read length (amplicons longer than about "
-                 f"{res.max_combined - cfg.dada2_min_overlap} nt, or some reads shorter than the rest); the lengths above come from the pairs that merged.")
+        w.append(_full_length_warning(res, cfg))
     if res.floor <= res.max_combined and res.max_combined - res.floor < 6:
         w.append(f"The reads only just span your longest amplicons (spare length: "
                  f"{res.max_combined - res.floor} nt). Longer reads would be more reliable.")
@@ -444,7 +479,7 @@ def _run_once(s: Settings, say: Callable[[str], None] = lambda msg: None) -> Res
             f"shortest total length that can merge them: {floor}")
 
     res = Result(cfg, sub, inserts, frac, longest, floor, max_combined, step=max(1, s.step),
-                 exhaustive=s.exhaustive, tolerance=tol)
+                 exhaustive=s.exhaustive, tolerance=tol, full_length_fail_reasons=_stage0_reasons(work))
     totals = list(range(floor, max_combined + 1, max(1, s.step)))
     if not totals:
         res.warnings = _warnings(res, bool(s.longest_insert))

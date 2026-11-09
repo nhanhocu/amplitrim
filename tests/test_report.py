@@ -99,6 +99,27 @@ def test_low_merge_rate_warning_names_shorter_reads_among_the_possible_causes():
     assert "shorter than the rest" in text
 
 
+def test_low_merge_rate_from_poor_read_ends_does_not_blame_long_amplicons():
+    # vsearch's reasons on a V1-V2 dataset (NIG, independent test): the pairs failed on differences, not on overlap
+    res = make_result()
+    res.frac_overlapping = 0.41
+    res.full_length_fail_reasons = {"too few kmers found on same diagonal": 1, "too many differences": 16070,
+                                    "alignment score too low, or score drop too high": 7554}
+    text = " ".join(_warnings(res, False))
+    assert "Only 41% of read pairs could be merged at full read length" in text
+    assert "read ends are of low quality" in text and "100% of the unmerged pairs" in text
+    assert "longer than about" not in text
+
+
+def test_low_merge_rate_from_a_missing_overlap_keeps_the_long_amplicon_wording():
+    res = make_result()
+    res.frac_overlapping = 0.60
+    res.full_length_fail_reasons = {"too few kmers found on same diagonal": 900, "overlap too short": 300,
+                                    "too many differences": 100}
+    text = " ".join(_warnings(res, False))
+    assert "longer than about" in text and "low quality" not in text
+
+
 def test_report_has_a_plain_your_data_section_and_no_read_through_note_when_amplicons_are_longer(tmp_path):
     text = write_outputs(make_result(), tmp_path).read_text()
     assert text.index("## Your data") < text.index("![summary]")
